@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha tester</title>
+</head>
+<body>
+    <h1>Captcha tester</h1>
+    <button onclick="generate_new_captcha()">Generate new captcha</button>
+    <br>
+    <img id="captcha_img">
+    <br>
+    <input id="captcha_input" type="text">
+    <br>
+    <button onclick="submit_captcha()">Submit captcha</button>
+    <h2 id="result"></h2>
+    <script>
+        let captcha_id = "";
+        function generate_new_captcha() {
+            fetch("http://127.0.0.1:8000/request")
+            .then((response) => response.json())
+            .then((data) => {
+                captcha_id = data.captcha_id
+                let image = document.getElementById("captcha_img");
+                image.setAttribute("src", `http://127.0.0.1:8000/captchaimage/${captcha_id}`)
+            });
+
+        }
+
+        function submit_captcha() {
+            let input_node = document.getElementById("captcha_input");
+            let text = input_node.value;
+            input_node.value = "";
+            fetch(`http://127.0.0.1:8000/verify/${captcha_id}/${text}`)
+            .then((response) => response.json())
+            .then((data) => {
+                let result = document.getElementById("result");
+                result.innerText = data.success;
+            })
+        }
+    </script>
+</body>
+</html>
